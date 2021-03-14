@@ -1,2 +1,0 @@
-# insight
-insightface自用
