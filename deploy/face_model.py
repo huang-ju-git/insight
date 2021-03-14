@@ -68,18 +68,24 @@ class FaceModel:
 
 
   def get_input(self, face_img):
-    ret = self.detector.detect_face(face_img, det_type = self.args.det)
-    if ret is None:
-      return None
-    bbox, points = ret
-    if bbox.shape[0]==0:
-      return None
-    bbox = bbox[0,0:4]
-    points = points[0,:].reshape((2,5)).T
-    #print(bbox)
-    #print(points)
-    nimg = face_preprocess.preprocess(face_img, bbox, points, image_size='112,112')
-    nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
+    # 以下为源代码
+    # ret = self.detector.detect_face(face_img, det_type = self.args.det)
+    # if ret is None:
+    #   return None
+    # bbox, points = ret
+    # if bbox.shape[0]==0:
+    #   return None
+    # bbox = bbox[0,0:4]
+    # points = points[0,:].reshape((2,5)).T
+    # #print(bbox)
+    # #print(points)
+    # nimg = face_preprocess.preprocess(face_img, bbox, points, image_size='112,112')
+    # nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
+    # aligned = np.transpose(nimg, (2,0,1))
+    # return aligned
+
+    # 以下为我的改动
+    nimg = cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB)
     aligned = np.transpose(nimg, (2,0,1))
     return aligned
 

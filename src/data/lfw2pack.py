@@ -9,9 +9,9 @@ import lfw
 
 parser = argparse.ArgumentParser(description='Package LFW images')
 # general
-parser.add_argument('--data-dir', default='', help='')
+parser.add_argument('--data-dir', default='/home/huangju/codes/insightface/datasets', help='')
 parser.add_argument('--image-size', type=str, default='112,96', help='')
-parser.add_argument('--output', default='', help='path to save.')
+parser.add_argument('--output', default='/home/huangju/codes/insightface/datasets/faces.bin', help='path to save.')
 args = parser.parse_args()
 lfw_dir = args.data_dir
 image_size = [int(x) for x in args.image_size.split(',')]

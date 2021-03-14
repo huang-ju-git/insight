@@ -28,8 +28,23 @@ import fdensenet
 import vargfacenet
 
 
+os.environ['CUDA_VISIBLE_DEVICES']='0'
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
+
+logfile = 'newlog'
+handler = logging.FileHandler(logfile, mode='a')
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
+handler.setFormatter(formatter)
+
+console = logging.StreamHandler()
+console.setLevel(logging.DEBUG)
+
+logger.addHandler(handler)
+logger.addHandler(console)
+
+#logfile = open("log.txt", "w",encoding="utf-8")
 
 
 args = None
@@ -153,12 +168,15 @@ def train_net(args):
         ctx.append(mx.gpu(i))
     if len(ctx)==0:
       ctx = [mx.cpu()]
-      print('use cpu')
+      #print('use cpu')
+      logger.info('use cpu'+'\n')
     else:
-      print('gpu num:', len(ctx))
+      #print('gpu num:', len(ctx))
+      logger.info('gpu num: '+ str(len(ctx))+'\n')
     prefix = os.path.join(args.models_root, '%s-%s-%s'%(args.network, args.loss, args.dataset), 'model')
     prefix_dir = os.path.dirname(prefix)
-    print('prefix', prefix)
+    #print('prefix', prefix)
+    logger.info('prefix '+ str(prefix)+'\n')
     if not os.path.exists(prefix_dir):
       os.makedirs(prefix_dir)
     args.ctx_num = len(ctx)
@@ -174,11 +192,14 @@ def train_net(args):
     image_size = config.image_shape[0:2]
     assert len(image_size)==2
     assert image_size[0]==image_size[1]
-    print('image_size', image_size)
-    print('num_classes', config.num_classes)
+    #print('image_size', image_size)
+    logger.info('image_size '+str(image_size)+'\n')
+    #print('num_classes', config.num_classes)
+    logger.info('num_classes '+str(config.num_classes)+'\n')
     path_imgrec = os.path.join(data_dir, "train.rec")
 
-    print('Called with argument:', args, config)
+    #print('Called with argument:', args, config)
+    logger.info('Called with argument: '+ str(args)+ str(config)+'\n')
     data_shape = (args.image_channel,image_size[0],image_size[1])
     mean = None
 
@@ -191,7 +212,8 @@ def train_net(args):
         data_shape_dict = {'data' : (args.per_batch_size,)+data_shape}
         spherenet.init_weights(sym, data_shape_dict, args.num_layers)
     else:
-      print('loading', args.pretrained, args.pretrained_epoch)
+      #print('loading', args.pretrained, args.pretrained_epoch)
+      logger.info('loading '+ str(args.pretrained)+ str(args.pretrained_epoch)+'\n')
       _, arg_params, aux_params = mx.model.load_checkpoint(args.pretrained, args.pretrained_epoch)
       sym = get_symbol(args)
 
@@ -200,7 +222,9 @@ def train_net(args):
       _sym = all_layers['fc1_output']
       FLOPs = flops_counter.count_flops(_sym, data=(1,3,image_size[0],image_size[1]))
       _str = flops_counter.flops_str(FLOPs)
-      print('Network FLOPs: %s'%_str)
+      #print('Network FLOPs: %s'%_str)
+      logger.info('Network FLOPs: %s'%_str)
+      
 
     #label_name = 'softmax_label'
     #label_shape = (args.batch_size,)
@@ -264,7 +288,8 @@ def train_net(args):
         data_set = verification.load_bin(path, image_size)
         ver_list.append(data_set)
         ver_name_list.append(name)
-        print('ver', name)
+        #print('ver', name)
+        logger.info('ver: '+ str(name)+'\n')
 
 
 
@@ -272,9 +297,11 @@ def train_net(args):
       results = []
       for i in range(len(ver_list)):
         acc1, std1, acc2, std2, xnorm, embeddings_list = verification.test(ver_list[i], model, args.batch_size, 10, None, None)
-        print('[%s][%d]XNorm: %f' % (ver_name_list[i], nbatch, xnorm))
+        #print('[%s][%d]XNorm: %f' % (ver_name_list[i], nbatch, xnorm))
+        logger.info('[%s][%d]XNorm: %f' % (ver_name_list[i], nbatch, xnorm)+'\n')
         #print('[%s][%d]Accuracy: %1.5f+-%1.5f' % (ver_name_list[i], nbatch, acc1, std1))
-        print('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (ver_name_list[i], nbatch, acc2, std2))
+        #print('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (ver_name_list[i], nbatch, acc2, std2))
+        logger.info('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (ver_name_list[i], nbatch, acc2, std2)+'\n')
         results.append(acc2)
       return results
 
@@ -286,7 +313,8 @@ def train_net(args):
     global_step = [0]
     save_step = [0]
     lr_steps = [int(x) for x in args.lr_steps.split(',')]
-    print('lr_steps', lr_steps)
+    #print('lr_steps', lr_steps)
+    logger.info('lr_steps: ' + str(lr_steps)+'\n')
     def _batch_callback(param):
       #global global_step
       global_step[0]+=1
@@ -294,12 +322,14 @@ def train_net(args):
       for step in lr_steps:
         if mbatch==step:
           opt.lr *= 0.1
-          print('lr change to', opt.lr)
+          #print('lr change to', opt.lr)
+          logger.info('lr change to: ' + str(opt.lr)+'\n')
           break
 
       _cb(param)
       if mbatch%1000==0:
-        print('lr-batch-epoch:',opt.lr,param.nbatch,param.epoch)
+        #print('lr-batch-epoch:',opt.lr,param.nbatch,param.epoch)
+        logger.info('lr-batch-epoch: ' + str(opt.lr)+str(param.nbatch)+str(param.epoch)+'\n')
 
       if mbatch>=0 and mbatch%args.verbose==0:
         acc_list = ver_test(mbatch)
@@ -334,7 +364,8 @@ def train_net(args):
           msave = 1
 
         if do_save:
-          print('saving', msave)
+          #print('saving', msave)
+          logger.info('saving: ' + str(msave)+'\n')
           arg, aux = model.get_params()
           if config.ckpt_embedding:
             all_layers = model.symbol.get_internals()
@@ -346,7 +377,8 @@ def train_net(args):
             mx.model.save_checkpoint(prefix, msave, _sym, _arg, aux)
           else:
             mx.model.save_checkpoint(prefix, msave, model.symbol, arg, aux)
-        print('[%d]Accuracy-Highest: %1.5f'%(mbatch, highest_acc[-1]))
+        #print('[%d]Accuracy-Highest: %1.5f'%(mbatch, highest_acc[-1]))
+        logger.info('[%d]Accuracy-Highest: %1.5f'%(mbatch, highest_acc[-1])+'\n')
       if config.max_steps>0 and mbatch>config.max_steps:
         sys.exit(0)
 
@@ -375,4 +407,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    #logfile.close()
 

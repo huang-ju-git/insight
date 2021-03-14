@@ -20,6 +20,15 @@ from mxnet import io
 import mxnet.ndarray as nd
 from config import config
 
+# logging.basicConfig(level=logging.DEBUG,#控制台打印的日志级别
+#                     filename='newlog',
+#                     filemode='a',##模式，有w和a，w就是写模式，每次都会重新写日志，覆盖之前的日志
+#                     #a是追加模式，默认如果不写的话，就是追加模式
+#                     format=
+#                     '%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+#                     #日志格式
+#                     )
+
 class ParallModule(BaseModule):
     def __init__(self, symbol, data_names, label_names,
                  logger=logging, context=ctx.cpu(), work_load_list=None,
