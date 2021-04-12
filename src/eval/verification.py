@@ -45,6 +45,8 @@ from mxnet import ndarray as nd
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'common'))
 import face_image
 
+os.environ['CUDA_VISIBLE_DEVICES']='0'
+
 
 class LFold:
   def __init__(self, n_splits = 2, shuffle = False):
@@ -187,7 +189,7 @@ def load_bin(path, image_size):
   for flip in [0,1]:
     data = nd.empty((len(issame_list)*2, 3, image_size[0], image_size[1]))
     data_list.append(data)
-  for i in xrange(len(issame_list)*2):
+  for i in range(len(issame_list)*2):
     _bin = bins[i]
     img = mx.image.imdecode(_bin)
     if img.shape[1]!=image_size[0]:
@@ -215,7 +217,7 @@ def test(data_set, mx_model, batch_size, nfolds=10, data_extra = None, label_sha
     _label = nd.ones( (batch_size,) )
   else:
     _label = nd.ones( label_shape )
-  for i in xrange( len(data_list) ):
+  for i in range( len(data_list) ):
     data = data_list[i]
     embeddings = None
     ba = 0
@@ -257,7 +259,7 @@ def test(data_set, mx_model, batch_size, nfolds=10, data_extra = None, label_sha
   _xnorm = 0.0
   _xnorm_cnt = 0
   for embed in embeddings_list:
-    for i in xrange(embed.shape[0]):
+    for i in range(embed.shape[0]):
       _em = embed[i]
       _norm=np.linalg.norm(_em)
       #print(_em.shape, _norm)
@@ -295,7 +297,7 @@ def test_badcase(data_set, mx_model, batch_size, name='', data_extra = None, lab
     _label = nd.ones( (batch_size,) )
   else:
     _label = nd.ones( label_shape )
-  for i in xrange( len(data_list) ):
+  for i in range( len(data_list) ):
     data = data_list[i]
     embeddings = None
     ba = 0
@@ -440,7 +442,7 @@ def test_badcase(data_set, mx_model, batch_size, name='', data_extra = None, lab
         #  imgb = cv2.transpose(imgb)
         #  imgb = cv2.flip(imgb, 0)
         #else:
-        #  for ii in xrange(2):
+        #  for ii in range(2):
         #    imgb = cv2.transpose(imgb)
         #    imgb = cv2.flip(imgb, 1)
       dist = out[2]
@@ -471,7 +473,7 @@ def dumpR(data_set, mx_model, batch_size, name='', data_extra = None, label_shap
     _label = nd.ones( (batch_size,) )
   else:
     _label = nd.ones( label_shape )
-  for i in xrange( len(data_list) ):
+  for i in range( len(data_list) ):
     data = data_list[i]
     embeddings = None
     ba = 0
@@ -507,9 +509,9 @@ if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description='do verification')
   # general
-  parser.add_argument('--data-dir', default='', help='')
-  parser.add_argument('--model', default='../model/softmax,50', help='path to load model.')
-  parser.add_argument('--target', default='lfw,cfp_ff,cfp_fp,agedb_30', help='test targets.')
+  parser.add_argument('--data-dir', default='/home/huangju/codes/insightface/datasets/surv_ms1m_msmt', help='')
+  parser.add_argument('--model', default='/home/huangju/codes/insightface/recognition/ArcFace/models8-surv_ms1m_msmt/r100-softmax-emore/model,46', help='path to load model.')
+  parser.add_argument('--target', default='msmt', help='test targets.')
   parser.add_argument('--gpu', default=0, type=int, help='gpu id')
   parser.add_argument('--batch-size', default=32, type=int, help='')
   parser.add_argument('--max', default='', type=str, help='')
@@ -571,7 +573,7 @@ if __name__ == '__main__':
       ver_name_list.append(name)
 
   if args.mode==0:
-    for i in xrange(len(ver_list)):
+    for i in range(len(ver_list)):
       results = []
       for model in nets:
         acc1, std1, acc2, std2, xnorm, embeddings_list = test(ver_list[i], model, args.batch_size, args.nfolds)

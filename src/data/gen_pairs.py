@@ -3,13 +3,14 @@ import os.path
 import numpy as np
 import os
 import re
+import itertools
 '''
 创建验证集bin的pairs.txt
 '''
 import random
 # 图片数据文件夹
-INPUT_DATA = '/home/huangju/dataset/QMUL-SurvFace/verification-set'
-pairs_file_path = '/home/huangju/codes/insightface/datasets/pairs.txt'
+INPUT_DATA = '/home/huangju/dataset/msmt17_112_folder'
+pairs_file_path = '/home/huangju/codes/insightface/datasets/pairs_msmt.txt'
 
 rootdir_list = os.listdir(INPUT_DATA)
 idsdir_list = [name for name in rootdir_list if os.path.isdir(os.path.join(INPUT_DATA, name))]
@@ -23,26 +24,37 @@ def produce_same_pairs():
     j=0
     while j < id_nums:
         #id_int= random.randint(0,id_nums-1)
+        faces = []
 
-        id_dir = os.path.join(INPUT_DATA, idsdir_list[j] )
+        id_dir = os.path.join(INPUT_DATA, idsdir_list[j] ) #遍历当前每个子目录
 
 
-        id_imgs_list = os.listdir(id_dir)
+        id_imgs_list = os.listdir(id_dir) #当前子目录下的图像list
+        for term in id_imgs_list:
+            file_path=os.path.join(id_dir, term)
+            faces.append(file_path)
+        if len(faces)>1:
+            iter = list(itertools.combinations(faces, 2))
+            new_len=min(10,len(iter))
+            iter=iter[:new_len] #每个id下最多取10对
+            for idx,(f1,f2) in enumerate(iter):
+                same = 1
+                matched_result.append((f1 + '\t' + f2 + '\t',same))
 
-        id_list_len = len(id_imgs_list)
-        # print(idsdir_list[j])
-        if id_list_len>=2:
-            id1_img_file = id_imgs_list[random.randint(0,id_list_len-1)]
-            id2_img_file = id_imgs_list[random.randint(0,id_list_len-1)]
-            while id2_img_file==id1_img_file:
-                id2_img_file = id_imgs_list[random.randint(0,id_list_len-1)]
+        # id_list_len = len(id_imgs_list) #当前子目录下的图像数量
+        # # print(idsdir_list[j])
+        # if id_list_len>=2:
+        #     id1_img_file = id_imgs_list[random.randint(0,id_list_len-1)]
+        #     id2_img_file = id_imgs_list[random.randint(0,id_list_len-1)]
+        #     while id2_img_file==id1_img_file:
+        #         id2_img_file = id_imgs_list[random.randint(0,id_list_len-1)]
 
-            id1_path = os.path.join(id_dir, id1_img_file)
-            id2_path = os.path.join(id_dir, id2_img_file)
+        #     id1_path = os.path.join(id_dir, id1_img_file)
+        #     id2_path = os.path.join(id_dir, id2_img_file)
 
-            same = 1
-            #print([id1_path + '\t' + id2_path + '\t',same])
-            matched_result.append((id1_path + '\t' + id2_path + '\t',same))
+        #     same = 1
+        #     #print([id1_path + '\t' + id2_path + '\t',same])
+        #     matched_result.append((id1_path + '\t' + id2_path + '\t',same))
         print(j)
         j+=1
     return matched_result
@@ -52,7 +64,7 @@ def produce_unsame_pairs():
     unmatched_result = set()  # 不同类的匹配对
     # j=0
     # while j<20000:
-    while len(unmatched_result)<6000:
+    while len(unmatched_result)<20000:
         id1_int = random.randint(0,id_nums-1)
         id2_int = random.randint(0,id_nums-1)
         while id1_int == id2_int:
