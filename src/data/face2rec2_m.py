@@ -242,8 +242,8 @@ def parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='Create an image list or \
         make a record database by reading from an image list')
-    parser.add_argument('--prefix', help='prefix of input/output lst and rec files.', default="/home/huangju/codes/insightface/datasets/dataset_large/")
-    parser.add_argument('--root', help='path to folder containing images.', default="/home/huangju/dataset/QMUL-SurvFace/align112_large")
+    parser.add_argument('--prefix', help='prefix of input/output lst and rec files.', default="/home/huangju/codes/insightface/datasets/msmt17-align/")
+    parser.add_argument('--root', help='path to folder containing images.', default="/home/huangju/dataset/msmt17_train-align")
 
     cgroup = parser.add_argument_group('Options for creating image lists')
     cgroup.add_argument('--list', type=bool, default=False,

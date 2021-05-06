@@ -9,8 +9,8 @@ import itertools
 '''
 import random
 # 图片数据文件夹
-INPUT_DATA = '/home/huangju/dataset/msmt17_112_folder'
-pairs_file_path = '/home/huangju/codes/insightface/datasets/pairs_msmt.txt'
+INPUT_DATA = '/home/huangju/dataset/msmt17_test-align'
+pairs_file_path = '/home/huangju/codes/insightface/datasets/pairs_msmt_align.txt'
 
 rootdir_list = os.listdir(INPUT_DATA)
 idsdir_list = [name for name in rootdir_list if os.path.isdir(os.path.join(INPUT_DATA, name))]

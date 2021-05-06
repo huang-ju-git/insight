@@ -16,22 +16,21 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src', 'common'))
 import face_image
 import face_preprocess
 import numpy as np
+from tqdm import tqdm
 
 mtcnn_path = os.path.join(os.path.dirname(__file__), 'mtcnn-model')
 
 detector = MtcnnDetector(model_folder=mtcnn_path, ctx=mx.cpu(0), num_worker = 4 , accurate_landmark = False)
 
-faces_path = r'/home/huangju/dataset/QMUL-SurvFace/QMUL-SurvFace/training_set'          # 人脸数据文件夹
-output_path = r'/home/huangju/dataset/QMUL-SurvFace/align112'    # 对齐后的保存的人脸数据文件夹
+faces_path = r'/home/huangju/codes/Camera-based-Person-ReID/data/test-old'          # 人脸数据文件夹
+output_path = r'/home/huangju/dataset/msmt17_test-align'    # 对齐后的保存的人脸数据文件夹
 
-for root,_,files in os.walk(faces_path):
+for root,_,files in tqdm(os.walk(faces_path)):
     for fname in files:
         img = cv2.imread(os.path.join(root,fname))
         # new_root = root.replace('20_faces','20_faces_clip')
         new_root = os.path.join(output_path,os.path.basename(root))
-        print(new_root)
-        if not os.path.exists(new_root):
-            os.mkdir(new_root)
+        # print(new_root)
         # run detector
         results = detector.detect_face(img)
 
@@ -50,6 +49,8 @@ for root,_,files in os.walk(faces_path):
 
         aligned = np.transpose(nimg, (0, 1, 2))
         # cv2.imshow('aligned', aligned)
+        if not os.path.exists(new_root):
+            os.mkdir(new_root)
         cv2.imwrite(os.path.join(new_root, fname), aligned)
         # cv2.imshow("img", img)
         # cv2.waitKey(0)

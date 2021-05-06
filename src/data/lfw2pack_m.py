@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description='Package LFW images')
 # general
 parser.add_argument('--data-dir', default='/home/huangju/codes/insightface/datasets', help='')
 parser.add_argument('--image-size', type=str, default='112,112', help='')
-parser.add_argument('--output', default='/home/huangju/codes/insightface/datasets/faces.bin', help='path to save.')
+parser.add_argument('--output', default='/home/huangju/codes/insightface/datasets/msmt-align.bin', help='path to save.')
 args = parser.parse_args()
 lfw_dir = args.data_dir
 image_size = [int(x) for x in args.image_size.split(',')]
@@ -57,7 +57,7 @@ def get_paths(data_dir, pairs, file_ext):
 
 
 
-data_pairs = read_pairs(os.path.join(lfw_dir, 'pairs.txt'))
+data_pairs = read_pairs(os.path.join(lfw_dir, 'pairs_msmt_align.txt'))
 data_paths, issame_list = get_paths(lfw_dir, data_pairs, 'jpg')
 #print(data_paths)
 print(len(data_paths))

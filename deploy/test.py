@@ -9,7 +9,7 @@ import random
 from numpy import linalg
 from tqdm import tqdm
 
-os.environ['CUDA_VISIBLE_DEVICES']='0'
+os.environ['CUDA_VISIBLE_DEVICES']='1'
 
 args = None
 
@@ -64,7 +64,7 @@ def test(args):
     #获取所有人脸特征，并存到pkl文件中
     model = face_model.FaceModel(args)
     pathss=[]
-    for root, dirs, files in os.walk("/home/huangju/dataset/msmt17_112"):
+    for root, dirs, files in os.walk("/home/huangju/dataset/face_imgs_detected_larger"):
         path = [os.path.join(root, name) for name in files]
             #print(path)
         pathss.extend(path)
@@ -214,9 +214,9 @@ if __name__ == '__main__':
 
 
     
-    base_path='/home/huangju/codes/insightface/recognition/ArcFace/models8-surv_ms1m_msmt-cosface2/r50-cosface-emore/model,'
-    #base_path='/home/huangju/codes/insightface/models/model-r100-ii/model,'
-    i=14
+    base_path='/home/huangju/codes/insightface/models/model-r100-ii/model,'
+    # base_path='/home/huangju/codes/insightface/recognition/ArcFace/models-surv_ms1m_based_msmt17-align-softmax/r100-softmax-emore/model,'
+    i=0
     path=base_path+str(i)
     args = parse_args(path)
     test(args)
