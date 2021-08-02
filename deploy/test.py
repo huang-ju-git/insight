@@ -8,8 +8,10 @@ import os
 import random
 from numpy import linalg
 from tqdm import tqdm
+import glob
+import os.path as osp
 
-os.environ['CUDA_VISIBLE_DEVICES']='1'
+os.environ['CUDA_VISIBLE_DEVICES']='0'
 
 args = None
 
@@ -64,7 +66,7 @@ def test(args):
     #获取所有人脸特征，并存到pkl文件中
     model = face_model.FaceModel(args)
     pathss=[]
-    for root, dirs, files in os.walk("/home/huangju/dataset/face_imgs_detected_larger"):
+    for root, dirs, files in os.walk("/home/huangju/codes/Camera-based-Person-ReID/data/test-old"):
         path = [os.path.join(root, name) for name in files]
             #print(path)
         pathss.extend(path)
@@ -73,13 +75,14 @@ def test(args):
     count=0 #记录提取特征的人脸的图片数量
     d={} #key: path  value: feature
     for path in tqdm(pathss):
-        if path.split('/')[-1].split("-")[0]=="train" or path.split('/')[-1].split("-")[0]=="query":
-            continue
+        # if path.split('/')[-1].split("-")[0]=="train" or path.split('/')[-1].split("-")[0]=="query":
+        #     continue
         img = cv2.imread(path)
         img = model.get_input(img)
         if img is not None:
             feature = model.get_feature(img)
-            key="data/msmt17/test/"+path.split('/')[-1].split('-')[1]+"/"+path.split('/')[-1].split('-')[-1]
+            # key="data/msmt17/test/"+path.split('/')[-1].split('-')[1]+"/"+path.split('/')[-1].split('-')[-1]
+            key="data/msmt17/test/"+path.split('/')[-1].split('_')[0]+"/"+path.split('/')[-1]
             d[key]=feature
             count+=1
             #print("count: {}".format(count))
@@ -87,7 +90,7 @@ def test(args):
 
     # with open("msmt_face_q_t-own2.pkl","wb") as f: 
     #     pickle.dump(d,f)
-    with open("face_feature-surv_ms1m_msmt.pkl","wb") as f: 
+    with open("face_feature.pkl","wb") as f: 
         pickle.dump(d,f)
 
 def cal():
@@ -188,6 +191,36 @@ def cal_small():
     face_rank1=count/2000
     return face_rank1
 
+def make_dml_face(args):
+    model = face_model.FaceModel(args)
+    pathss=[]
+    dir_path="/home/huangju/dataset/dml_ped12"
+    img_paths = glob.glob(osp.join(dir_path, '*/*/*.jpg'))
+    for img_path in img_paths:
+        if img_path.split('/')[-1].split('.')[0].split("_")[-1]=="face":
+            pathss.append(img_path)
+
+    count=0 #记录提取特征的人脸的图片数量
+    d={} #key: path  value: feature
+    for path in tqdm(pathss):
+        # if path.split('/')[-1].split("-")[0]=="train" or path.split('/')[-1].split("-")[0]=="query":
+        #     continue
+        img = cv2.imread(path)
+        img = model.get_input(img)
+        if img is not None:
+            feature = model.get_feature(img)
+            # key="data/msmt17/test/"+path.split('/')[-1].split('-')[1]+"/"+path.split('/')[-1].split('-')[-1]
+            key=path.split('/')[-3]+"/"+path.split('/')[-2]+"/"+path.split('/')[-1]
+            d[key]=feature
+            count+=1
+    print("count: {}".format(count))
+    
+
+    # with open("msmt_face_q_t-own2.pkl","wb") as f: 
+    #     pickle.dump(d,f)
+    with open("dml/dmlface_feature.pkl","wb") as f: 
+        pickle.dump(d,f)
+
 
 if __name__ == '__main__':
 
@@ -219,8 +252,39 @@ if __name__ == '__main__':
     i=0
     path=base_path+str(i)
     args = parse_args(path)
-    test(args)
-    
-    
+    make_dml_face(args)
 
+    # base_path='/home/huangju/codes/insightface/models/model-r100-ii/model,'
+    # i=0
+    # path=base_path+str(i)
+    # args = parse_args(path)
+    # model = face_model.FaceModel(args)
+    # img1 = cv2.imread("imgs/18_0.jpg")
+    # img1 = model.get_input(img1)
+    # feature1 = model.get_feature(img1)
+    # img2 = cv2.imread("imgs/18_1.jpg")
+    # img2 = model.get_input(img2)
+    # feature2 = model.get_feature(img2)
 
+    # img3 = cv2.imread("imgs/18_2.jpg")
+    # img3 = model.get_input(img3)
+    # feature3 = model.get_feature(img3)
+
+    # img4 = cv2.imread("imgs/18_3.jpg")
+    # img4 = model.get_input(img4)
+    # feature4 = model.get_feature(img4)
+
+    # img5 = cv2.imread("imgs/18_4.jpg")
+    # img5 = model.get_input(img5)
+    # feature5 = model.get_feature(img5)
+
+    # s=cos_sim(np.array(feature1),np.array(feature2))
+    # print(s)
+    # s=cos_sim(np.array(feature1),np.array(feature3))
+    # print(s)
+    # s=cos_sim(np.array(feature1),np.array(feature4))
+    # print(s)
+    # s=cos_sim(np.array(feature1),np.array(feature5))
+    # print(s)
+    # s=cos_sim(np.array(feature2),np.array(feature3))
+    # print(s)

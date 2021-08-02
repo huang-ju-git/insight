@@ -28,11 +28,11 @@ import fdensenet
 import vargfacenet
 
 
-os.environ['CUDA_VISIBLE_DEVICES']='1'
+os.environ['CUDA_VISIBLE_DEVICES']='0'
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-logfile = 'surv_ms1m_msmt-cosface.log'
+logfile = 'surv_ms1m_based_msmt17-align.log'
 handler = logging.FileHandler(logfile, mode='a')
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")

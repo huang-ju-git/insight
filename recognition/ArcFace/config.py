@@ -114,10 +114,10 @@ dataset = edict()
 
 dataset.emore = edict()
 dataset.emore.dataset = 'emore'
-dataset.emore.dataset_path = '/home/huangju/codes/insightface/datasets/surv_ms1m_msmt/'
-dataset.emore.num_classes = 8712
+dataset.emore.dataset_path = '/home/huangju/codes/insightface/datasets/msmt17-align/'
+dataset.emore.num_classes = 968
 dataset.emore.image_shape = (112,112,3)
-dataset.emore.val_targets = ['faces','msmt']
+dataset.emore.val_targets = ['faces','msmt-align']
 
 dataset.retina = edict()
 dataset.retina.dataset = 'retina'
@@ -185,25 +185,25 @@ default = edict()
 # default.pretrained = '/home/huangju/codes/insightface/models/model-r100-ii/model'
 # default.pretrained_epoch = 0
 
-default.network = 'r50'
-default.pretrained = './models8-surv_ms1m_msmt-cosface/r50-cosface-emore/model'
-default.pretrained_epoch = 105
+default.network = 'r100'
+default.pretrained = '/home/huangju/codes/insightface/recognition/ArcFace/models-surv_ms1m-align-softmax/r100-softmax-emore/model'
+default.pretrained_epoch = 31
 
 # default dataset
 default.dataset = 'emore'
-default.loss = 'cosface'
+default.loss = 'softmax'
 default.frequent = 20
-default.verbose = 2000
+default.verbose = 200
 default.kvstore = 'device'
 
 default.end_epoch = 200
-default.lr = 0.01
+default.lr = 0.1
 default.wd = 0.0005
 default.mom = 0.9
 default.per_batch_size = 64
 default.ckpt = 2
-default.lr_steps = '40000,80000,100000'
-default.models_root = './models8-surv_ms1m_msmt-cosface2'
+default.lr_steps = '1500,3000,5000'
+default.models_root = './models-surv_ms1m_based_msmt17-align-softmax'
 
 
 def generate_config(_network, _dataset, _loss):

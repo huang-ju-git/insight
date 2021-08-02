@@ -22,19 +22,27 @@ mtcnn_path = os.path.join(os.path.dirname(__file__), 'mtcnn-model')
 
 detector = MtcnnDetector(model_folder=mtcnn_path, ctx=mx.cpu(0), num_worker = 4 , accurate_landmark = False)
 
-faces_path = r'/home/huangju/codes/Camera-based-Person-ReID/data/test-old'          # 人脸数据文件夹
-output_path = r'/home/huangju/dataset/msmt17_test-align'    # 对齐后的保存的人脸数据文件夹
+faces_path = r'/home/huangju/dataset/QMUL-SurvFace/surv_56-large'          # 人脸数据文件夹
+output_path = r'/home/huangju/dataset/QMUL-SurvFace/surv_56-large-rescale112'    # 对齐后的保存的人脸数据文件夹
 
 for root,_,files in tqdm(os.walk(faces_path)):
     for fname in files:
         img = cv2.imread(os.path.join(root,fname))
+        sp = img.shape
+        if sp[0]<56 and sp[1]<56:
+            continue
         # new_root = root.replace('20_faces','20_faces_clip')
         new_root = os.path.join(output_path,os.path.basename(root))
         # print(new_root)
         # run detector
         results = detector.detect_face(img)
 
-        if results is None:
+        if results is None: #这里修改为：能矫正的矫正，不能矫正的resize
+            nimg = face_preprocess.preprocess(img, None, None, image_size='112,112')
+            aligned = np.transpose(nimg, (0, 1, 2))
+            if not os.path.exists(new_root):
+                os.mkdir(new_root)
+            cv2.imwrite(os.path.join(new_root, fname), aligned)
             continue
         bbox, points = results
         if bbox.shape[0] == 0:
